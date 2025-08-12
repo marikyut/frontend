@@ -26,7 +26,7 @@ export default function Login() {
 
       if (loginUser.fulfilled.match(resultAction)) {
         // ✅ Navigate to SignUp after successful login
-        navigate("/Signup");
+        navigate("/homepage");
       } else {
         // ❌ Show error message
         alert(resultAction.payload || "Login failed");
