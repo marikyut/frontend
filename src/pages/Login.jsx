@@ -25,8 +25,8 @@ export default function Login() {
       const resultAction = await dispatch(loginUser(form));
 
       if (loginUser.fulfilled.match(resultAction)) {
-        // ✅ Navigate to homepage after successful login
-        navigate("/homepage");
+        // ✅ Navigate to SignUp after successful login
+        navigate("/Signup");
       } else {
         // ❌ Show error message
         alert(resultAction.payload || "Login failed");
@@ -123,9 +123,13 @@ export default function Login() {
         {/* Footer */}
         <p className="mt-8 text-center text-gray-600">
           Don’t have an account?{" "}
-          <a href="#" className="text-blue-600 hover:underline font-medium">
+          <button
+            type="button"
+            onClick={() => navigate("/Signup")}
+            className="text-blue-600 hover:underline font-medium"
+          >
             Sign up
-          </a>
+          </button>
         </p>
       </div>
     </div>
