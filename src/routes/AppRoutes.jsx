@@ -1,19 +1,29 @@
-import {Routes, Route } from 'react-router-dom';
-import Login from '../pages/Login.jsx';
-import Signup from '../pages/Signup.jsx';
-import Homepage from '../pages/Homepage.jsx';
+import { Routes, Route } from "react-router-dom";
+import Login from "../pages/Login.jsx";
+import Employee from "../pages/Employee.jsx";
+import AddEmployee from "../pages/AddEmployee.jsx";
+import ProtectedRoute from "../components/ProtectedRoute.jsx";
 
 export default function AppRoutes() {
-    return (
-       
-        <Routes>
-             
-            <Route path="/" element={<Login />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/Signup" element={<Signup />} />
-            <Route path="/homepage" element={<Homepage />} />
-           
-        </Routes>
-        
-    )
+  return (
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route
+        path="/employee"
+        element={
+          <ProtectedRoute>
+            <Employee />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/add-employee"
+        element={
+          <ProtectedRoute>
+            <AddEmployee />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
 }
