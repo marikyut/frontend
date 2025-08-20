@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 // Import your login thunk/action
 import { loginUser } from "../features/auth/authSlice";
@@ -8,6 +9,8 @@ import { loginUser } from "../features/auth/authSlice";
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -19,26 +22,38 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       // Dispatch login action
       const resultAction = await dispatch(loginUser(form));
 
       if (loginUser.fulfilled.match(resultAction)) {
-        // ✅ Navigate to SignUp after successful login
-        navigate("/homepage");
+     const userEmail = resultAction.payload.user?.email || "Admin";
+      const { user, token } = resultAction.payload;
+
+        // Store user and token in localStorage
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("authUser", JSON.stringify(user));
+       
+        // Success message
+        toast.success(`Welcome back, ${userEmail}!`);
+        // Redirect to Employee page on successful login
+        navigate("/employee");
       } else {
         // ❌ Show error message
-        alert(resultAction.payload || "Login failed");
+        toast.error(resultAction.payload || "Login failed");
       }
     } catch (error) {
       console.error("Login error:", error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md rounded-xl bg-white shadow-xl p-10">
+      <div className="w-full max-w-xl max-h-3xl rounded-xl bg-white shadow-xl p-10">
         {/* Header */}
         <h1 className="text-3xl font-bold text-gray-800 text-center mb-4">
           Welcome Back
@@ -112,25 +127,42 @@ export default function Login() {
           </div>
 
           {/* Submit */}
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-blue-600 px-4 py-3 text-xl text-white font-bold shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            Sign in
-          </button>
-        </form>
+         <button
+  type="submit"
+  disabled={loading}
+  className={`w-full rounded-lg px-4 py-3 text-xl font-bold shadow focus:outline-none focus:ring-2 focus:ring-blue-500
+    ${loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white"}`}
+>
+  {loading ? (
+    <div className="flex items-center justify-center">
+      <svg
+        className="animate-spin h-6 w-6 text-white mr-2"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        ></circle>
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+        ></path>
+      </svg>
+      Logging in...
+    </div>
+  ) : (
+    "Sign in"
+  )}
+</button>
 
-        {/* Footer */}
-        <p className="mt-8 text-center text-gray-600">
-          Don’t have an account?{" "}
-          <button
-            type="button"
-            onClick={() => navigate("/Signup")}
-            className="text-blue-600 hover:underline font-medium"
-          >
-            Sign up
-          </button>
-        </p>
+        </form>       
       </div>
     </div>
   );
